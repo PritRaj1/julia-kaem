@@ -54,11 +54,9 @@ function test_grid_update()
 
     updater = GridUpdater(model, conf)
     compiled_update = Reactant.@compile updater(
-        x,
         ps,
         st_kan,
         Lux.testmode(st_lux),
-        1,
         st_rng,
     )
 
@@ -68,11 +66,9 @@ function test_grid_update()
     ebm_grid_before = Array(st_kan.ebm.a.grid)
 
     ps, st_kan, st_lux = compiled_update(
-        x,
         ps,
         st_kan,
         Lux.testmode(st_lux),
-        1,
         st_rng
     )
 

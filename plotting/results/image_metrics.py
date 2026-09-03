@@ -190,63 +190,60 @@ if __name__ == "__main__":
         if args.dataset:
             file_paths = [(g, r) for g, r in file_paths if args.dataset.upper() in g]
     else:
-        file_paths = (
-            [
-                (
-                    f"logs/{method}/{dataset}/ULA/mixture/generated_images.h5",
-                    get_real_samples_path(dataset),
-                )
-                for dataset in ("SVHN", "CIFAR10", "CELEBA")
-                for method in ("Vanilla", "Thermodynamic")
-            ]
-            + [
-                # (
-                #     "logs/Baseline/CIFAR10/VAE/generated_images.h5",
-                #     get_real_samples_path("CIFAR10"),
-                # ),
-                # (
-                #     "logs/Baseline/CELEBA/VAE/generated_images.h5",
-                #     get_real_samples_path("CELEBA"),
-                # ),
-                # (
-                #     "logs/Baseline/SVHN/VAE/generated_images.h5",
-                #     get_real_samples_path("SVHN"),
-                # ),
-                # (
-                #     "logs/Baseline/CIFAR10/PANG/generated_images.h5",
-                #     get_real_samples_path("CIFAR10"),
-                # ),
-                # (
-                #     "logs/Baseline/CELEBA/PANG/generated_images.h5",
-                #     get_real_samples_path("CELEBA"),
-                # ),
-                # (
-                #     "logs/Baseline/SVHN/PANG/generated_images.h5",
-                #     get_real_samples_path("SVHN"),
-                # ),
-                # (
-                #     "logs/Baseline/CIFAR10/DDPM/generated_images.h5",
-                #     get_real_samples_path("CIFAR10"),
-                # ),
-                # (
-                #     "logs/Baseline/CELEBA/DDPM/generated_images.h5",
-                #     get_real_samples_path("CELEBA"),
-                # ),
-                # (
-                #     "logs/Baseline/SVHN/DDPM/generated_images.h5",
-                #     get_real_samples_path("SVHN"),
-                # ),
-                # (
-                #     "logs/Baseline/CIFAR10/GAN/generated_images.h5",
-                #     get_real_samples_path("CIFAR10"),
-                # ),
-                # # Pretrained - CIFAR10
-                # (
-                #     "logs/Pretrained/CIFAR10/VAE/generated_images.h5",
-                #     get_real_samples_path("CIFAR10"),
-                # ),
-            ]
-        )
+        file_paths = [
+            (
+                f"logs/{method}/{dataset}/ULA/mixture/generated_images.h5",
+                get_real_samples_path(dataset),
+            )
+            for dataset in ("SVHN", "CIFAR10", "CELEBA")
+            for method in ("Vanilla", "Thermodynamic")
+        ] + [
+            # (
+            #     "logs/Baseline/CIFAR10/VAE/generated_images.h5",
+            #     get_real_samples_path("CIFAR10"),
+            # ),
+            # (
+            #     "logs/Baseline/CELEBA/VAE/generated_images.h5",
+            #     get_real_samples_path("CELEBA"),
+            # ),
+            # (
+            #     "logs/Baseline/SVHN/VAE/generated_images.h5",
+            #     get_real_samples_path("SVHN"),
+            # ),
+            (
+                "logs/Baseline/CIFAR10/PANG/generated_images.h5",
+                get_real_samples_path("CIFAR10"),
+            ),
+            (
+                "logs/Baseline/CELEBA/PANG/generated_images.h5",
+                get_real_samples_path("CELEBA"),
+            ),
+            # (
+            "logs/Baseline/SVHN/PANG/generated_images.h5",
+            get_real_samples_path("SVHN"),
+            # ),
+            # (
+            #     "logs/Baseline/CIFAR10/DDPM/generated_images.h5",
+            #     get_real_samples_path("CIFAR10"),
+            # ),
+            # (
+            #     "logs/Baseline/CELEBA/DDPM/generated_images.h5",
+            #     get_real_samples_path("CELEBA"),
+            # ),
+            # (
+            #     "logs/Baseline/SVHN/DDPM/generated_images.h5",
+            #     get_real_samples_path("SVHN"),
+            # ),
+            # (
+            #     "logs/Baseline/CIFAR10/GAN/generated_images.h5",
+            #     get_real_samples_path("CIFAR10"),
+            # ),
+            # # Pretrained - CIFAR10
+            # (
+            #     "logs/Pretrained/CIFAR10/VAE/generated_images.h5",
+            #     get_real_samples_path("CIFAR10"),
+            # ),
+        ]
 
     # Filter to only existing files
     file_paths = [

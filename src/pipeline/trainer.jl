@@ -220,11 +220,9 @@ function train!(t::KAEM_trainer; train_idx::Int = 1, trial = nothing)
     if t.grid_updater.update_prior_grid || t.grid_updater.update_llhood_grid
         println("Compiling grid_updater...")
         grid_compiled = Reactant.@compile t.grid_updater(
-            t.x,
             t.ps,
             t.st_kan,
             Lux.testmode(t.st_lux),
-            train_idx,
             t.st_rng,
         )
         println("grid_updater compiled.")
@@ -272,11 +270,9 @@ function train!(t::KAEM_trainer; train_idx::Int = 1, trial = nothing)
         if (train_idx - t.last_grid_update >= t.grid_updater.update_frequency) && (t.grid_updater.update_llhood_grid || t.grid_updater.update_prior_grid) && train_idx > 1
 
             t.ps, t.st_kan, st_lux = grid_compiled(
-                t.x,
                 t.ps,
                 t.st_kan,
                 Lux.testmode(t.st_lux),
-                train_idx,
                 t.st_rng,
             )
             t.st_lux = Lux.trainmode(st_lux)

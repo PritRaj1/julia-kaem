@@ -11,15 +11,9 @@ using ..KAEM_model.EBM_Model
 using ..KAEM_model.Quadrature: get_gausslegendre
 
 include("kan/grid_updating.jl")
+include("posterior_sampling/langevin.jl")
 using .GridUpdating
-
-function sample_z(model, ps, st_kan, st_lux, x, st_rng, train_idx)
-    if model.N_t > 1
-        temps = collect(Float32, [(k / model.N_t)^compute_p(model, train_idx) for k in 1:model.N_t])
-        return first(model.posterior_sampler(ps, st_kan, st_lux, x, st_rng; temps = temps))[:, :, :, end]
-    end
-    return first(model.posterior_sampler(ps, st_kan, st_lux, x, st_rng))[:, :, :, end]
-end
+using .LangevinSampling
 
 function rbf_scale(fcn, st_layer, new_grid)
     fcn.spline_string == "RBF" || return st_layer.scale
@@ -58,6 +52,7 @@ struct GridUpdater
     update_prior_grid
     update_llhood_grid
     nogrid_prior
+    sampler
 end
 
 function GridUpdater(model, conf::ConfParse)
@@ -75,6 +70,10 @@ function GridUpdater(model, conf::ConfParse)
     nogrid_prior = prior_grid_trainable || prior_func == "FFT" || prior_func == "Cheby" || prior_func == "Wavelet"
     nogrid_gen = gen_grid_trainable || gen_func == "FFT" || gen_func == "Cheby" || gen_func == "Wavelet"
 
+    N = parse(Int, retrieve(conf, "PRIOR_LANGEVIN", "iters"))
+    η = parse(Float32, retrieve(conf, "PRIOR_LANGEVIN", "step_size"))
+    ula = initialize_ULA_sampler(model; η = η, N = N, prior_sampling_bool = true)
+
     return GridUpdater(
         model,
         grid_update_frequency,
@@ -82,24 +81,23 @@ function GridUpdater(model, conf::ConfParse)
         update_prior_grid,
         update_llhood_grid && !model.lkhood.CNN && !model.lkhood.SEQ && !nogrid_gen,
         nogrid_prior,
+        ula
     )
 end
 
 function (gu::GridUpdater)(
-        x,
         ps,
         st_kan,
         st_lux,
-        train_idx,
         st_rng,
     )
     """Update KAN grids using prior samples."""
 
     model = gu.model
-    init_z = gu.update_prior_grid || gu.update_llhood_grid ? sample_z(model, ps, st_kan, st_lux, x, st_rng, train_idx) : nothing
+    x = first(model(ps, st_kan, st_lux, st_rng))
     if gu.update_prior_grid
         ula_bool = model.prior.bool_config.ula || model.sampler_type != "importance" || model.N_t > 1
-        z = init_z .* 1.0f0
+        z = first(gu.sampler(ps, st_kan, st_lux, x, st_rng))
 
         # Must update domain for inverse transform sampling
         if (ula_bool && gu.nogrid_prior)
@@ -176,7 +174,7 @@ function (gu::GridUpdater)(
 
     # Only update if KAN-type generator requires
     if gu.update_llhood_grid
-        z = dropdims(sum(init_z .* 1.0f0; dims = 2); dims = 2)
+        z = dropdims(sum(first(gu.sampler(ps, st_kan, st_lux, x, st_rng)); dims = 2); dims = 2)
 
         for i in 1:model.lkhood.generator.depth
             if model.lkhood.generator.bool_config.layernorm

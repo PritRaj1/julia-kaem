@@ -50,7 +50,7 @@ function get_gausslegendre(
     """Get Gauss-Legendre nodes and weights for prior's domain"""
     a, b = ebm.bool_config.no_grid ?
         (st_kan[:a].min, st_kan[:a].max) :
-        (st_kan[:a].grid[:, 1], st_kan[:a].grid[:, end])
+        (dropdims(minimum(st_kan[:a].grid; dims = 2), dims = 2), dropdims(maximum(st_kan[:a].grid; dims = 2), dims = 2))
 
     nodes = ((a .+ b) ./ 2 .+ (b .- a) ./ 2) * init_nodes
     weights = ((b .- a) ./ 2) * init_weights

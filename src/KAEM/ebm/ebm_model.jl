@@ -87,7 +87,7 @@ function init_EbmModel(
             "ebm" => grid_range,
             "learnable_gaussian" => grid_range,
             "lognormal" => [0.0f0, 4.0f0],
-            "gaussian" => [-3.0f0, 3.0f0],
+            "gaussian" => [-12.0f0, 12.0f0],
             "uniform" => [0.0f0, 1.0f0],
         )[prior_type]
     end
