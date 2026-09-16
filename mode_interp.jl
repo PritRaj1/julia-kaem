@@ -110,7 +110,7 @@ function kde_peaks(
         grid::AbstractVector{Float32},
         density::AbstractVector{Float32};
         rel_prominence = 0.2f0,
-        min_sep = 0.2f0,
+        min_sep = 0.1f0,
     )
     n = length(grid)
     dmax = maximum(density)
